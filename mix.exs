@@ -8,6 +8,7 @@ defmodule Pagination.MixProject do
       elixir: "~> 1.9",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
       deps: deps()
     ]
   end
@@ -29,6 +30,12 @@ defmodule Pagination.MixProject do
       {:phoenix_html, ">= 2.0.0", optional: true},
       {:ecto_sql, ">= 3.0.0", only: :test},
       {:postgrex, "~> 0.15.0", only: :test}
+    ]
+  end
+
+  defp aliases do
+    [
+      test: ["ecto.drop", "ecto.create", "ecto.migrate", "test"]
     ]
   end
 end

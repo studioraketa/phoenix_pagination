@@ -125,6 +125,5 @@ It is possible to overrdie the `Next`, `Previous` and `...` labels like so:
 
 ## TODO
 
-- [ ] Work with preloads (`User |> Repo.preload(:posts) |> Repo.paginate()`)
-- [ ] Work with more complex queries
-- [ ] Improve docs and tests
+- [ ] Work with queries including `group by` clauses.
+- [ ] Improve documentation and tests

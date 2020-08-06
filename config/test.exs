@@ -3,6 +3,7 @@ use Mix.Config
 config :phoenix_pagination, ecto_repos: [Pagination.Test.Repo]
 
 config :phoenix_pagination, Pagination.Test.Repo,
+  priv: "test/support/priv/repo",
   adapter: Ecto.Adapters.Postgres,
   pool: Ecto.Adapters.SQL.Sandbox,
   username: "postgres",
