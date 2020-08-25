@@ -7,7 +7,5 @@ defmodule Pagination.Test.User do
     field(:name, :string)
 
     has_many :posts, Post
-
-    timestamps()
   end
 end
