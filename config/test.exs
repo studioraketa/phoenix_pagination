@@ -13,3 +13,4 @@ config :phoenix_pagination, Pagination.Test.Repo,
   pool_size: 10
 
 config :logger, :console, level: :error
+# config :logger, :console, format: "[$level] $message\n"

@@ -8,7 +8,5 @@ defmodule Pagination.Test.Post do
     field(:content, :string)
 
     belongs_to :user, User, on_replace: :nilify
-
-    timestamps()
   end
 end
