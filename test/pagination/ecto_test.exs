@@ -127,5 +127,54 @@ defmodule Pagination.EctoTest do
       assert list.current_page == 2
       assert list.entries == posts |> Enum.take(6) |> Enum.chunk_every(3) |> List.last()
     end
+
+    test "paginate/1 a query with group by" do
+      users = create_users_with_posts()
+      green = create_tag("green")
+      blue = create_tag("blue")
+
+      Enum.each(
+        users,
+        fn user ->
+          Enum.each(
+            user.posts,
+            fn post ->
+              create_post_tag(post, green)
+              create_post_tag(post, blue)
+            end
+          )
+        end
+      )
+
+      query = from(
+        post in Post,
+        join: pt in "post_tags",
+        on: post.id == pt.post_id,
+        join: tag in Tag,
+        on: tag.id == pt.tag_id,
+        group_by: [post.user_id, tag.slug],
+        order_by: [asc: post.user_id, asc: tag.slug],
+        select: %{
+          user_id: post.user_id,
+          count: count(post.id),
+          tag: tag.slug
+        }
+      )
+
+      %Pagination.Ecto.List{} = list = Repo.paginate(query, %{"page_size" => 4})
+
+      [user_one, user_two | _tail] = users
+
+      assert list.entries_count == 40
+      assert list.page_size == 4
+      assert list.pages_count == 10
+      assert list.current_page == 1
+      assert list.entries == [
+        %{count: 20, user_id: user_one.id, tag: blue.slug},
+        %{count: 20, user_id: user_one.id, tag: green.slug},
+        %{count: 20, user_id: user_two.id, tag: blue.slug},
+        %{count: 20, user_id: user_two.id, tag: green.slug}
+      ]
+    end
   end
 end

@@ -14,17 +14,20 @@ defmodule Pagination.Ecto.Query do
     queryable
     |> exclude(:preload)
     |> exclude(:order_by)
-    |> exclude(:select)
-    |> handle_distinct()
+    |> prep_for_count()
     |> select(count("*"))
     |> opts.repo.one
   end
 
   # When having a distinct in the query do a subquery from the original query and then
   # select count.
-  defp handle_distinct(%{distinct: _expr} = queryable) do
-    subquery(queryable)
+  defp prep_for_count(%{distinct: term} = queryable) when term == true or is_list(term) do
+    queryable
+    |> exclude(:select)
+    |> subquery()
   end
 
-  defp handle_distinct(queryable), do: queryable
+  defp prep_for_count(%{group_bys: _term} = queryable), do: subquery(queryable)
+
+  defp prep_for_count(queryable), do: exclude(queryable, :select)
 end
