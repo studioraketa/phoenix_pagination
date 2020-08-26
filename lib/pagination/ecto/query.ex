@@ -20,14 +20,20 @@ defmodule Pagination.Ecto.Query do
   end
 
   # When having a distinct in the query do a subquery from the original query and then
-  # select count.
-  defp prep_for_count(%{distinct: term} = queryable) when term == true or is_list(term) do
+  # select count the results.
+  defp prep_for_count(%{distinct: %Ecto.Query.QueryExpr{} = _expr} = queryable) do
     queryable
     |> exclude(:select)
     |> subquery()
   end
 
-  defp prep_for_count(%{group_bys: _term} = queryable), do: subquery(queryable)
+  # When having a group by in the query do a subquery from the original query and then
+  # select count to count the results.
+  defp prep_for_count(%{group_bys: [%Ecto.Query.QueryExpr{} = _expr]} = queryable) do
+    subquery(queryable)
+  end
 
-  defp prep_for_count(queryable), do: exclude(queryable, :select)
+  defp prep_for_count(queryable) do
+    exclude(queryable, :select)
+  end
 end
