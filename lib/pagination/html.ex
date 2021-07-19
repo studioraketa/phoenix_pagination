@@ -26,7 +26,7 @@ defmodule Pagination.Html do
 
   defp middle(%List{current_page: current_page} = list, path_fn, opts) do
     list
-    |> Navigation.elements()
+    |> Navigation.elements(opts)
     |> Enum.map(
         fn
           "..." = page ->

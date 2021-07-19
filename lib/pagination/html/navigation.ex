@@ -4,8 +4,14 @@ defmodule Pagination.Html.Navigation do
   @peripheral_links_count 2
   @surround_links_count 3
 
-  def elements(%List{current_page: current_page} = list) do
-    before_current_page(list) ++ [current_page | after_current_page(list)]
+  def elements(%List{current_page: current_page, pages_count: pages_count} = list, opts \\ []) do
+    case Keyword.get(opts, :show_all_pages) do
+      true ->
+        Enum.to_list(1..pages_count)
+      _ ->
+        before_current_page(list) ++ [current_page | after_current_page(list)]
+    end
+
   end
 
   defp before_current_page(%List{current_page: 1}), do: []

@@ -63,4 +63,16 @@ defmodule Pagination.Html.NavigationTest do
 
     assert [1, 2, "...", 4, 5, 6, 7, 8, 9, 10, "...", 12, 13] == Navigation.elements(list)
   end
+
+  test "elements/1 with show_all_pages option set to true" do
+    list = %List{
+      entries: [],
+      current_page: 1,
+      page_size: 10,
+      entries_count: 100,
+      pages_count: 10
+    }
+
+    assert [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] == Navigation.elements(list, [show_all_pages: true])
+  end
 end
