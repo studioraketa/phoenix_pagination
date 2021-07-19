@@ -9,7 +9,7 @@ Add `phoenix_pagination` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:phoenix_pagination, "~> 0.3.0", git: "https://github.com/studioraketa/phoenix_pagination.git"}
+    {:phoenix_pagination, "~> 0.4.0", git: "https://github.com/studioraketa/phoenix_pagination.git"}
   ]
 end
 ```
@@ -117,6 +117,7 @@ It is possible to overrdie the `Next`, `Previous` and `...` labels like so:
 ```
 
 You can choose to render links to all pages. Use the option `show_all_pages`:
+
 ```elixir
   <%= paginate_list(
     @list,
