@@ -116,6 +116,19 @@ It is possible to overrdie the `Next`, `Previous` and `...` labels like so:
   ) %>
 ```
 
+You can choose to render links to all pages. Use the option `show_all_pages`:
+```elixir
+  <%= paginate_list(
+    @list,
+    fn page ->
+      Routes.post_path(@conn, :index, [page: page])
+    end,
+    [
+      show_all_pages: true,
+    ]
+  ) %>
+```
+
 ## Development
 
 - Do some changes
