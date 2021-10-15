@@ -61,7 +61,7 @@ The result is a struct:
 
 ### In the html templates
 
-Inside your `MyAppWeb` import the `Paginatino.Html` module
+Inside your `MyAppWeb` import the `Pagination.Html` module
 
 ```elixir
 import Pagination.Html
