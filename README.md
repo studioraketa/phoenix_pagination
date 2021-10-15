@@ -61,13 +61,13 @@ The result is a struct:
 
 ### In the html templates
 
-Inside your `MyAppWeb` import the `Pagination.Html` module
+Inside your `MyAppWeb` in the `view` import the `Pagination.Html` module.
 
 ```elixir
 import Pagination.Html
 ```
 
-and then in the views you can do the following:
+and then in the `eex` templates you can do the following:
 
 ```elixir
   <%= paginate_list(
