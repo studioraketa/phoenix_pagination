@@ -35,7 +35,7 @@ defmodule Pagination.EctoTest do
     test "paginate/1 paginate a query using the defaults" do
       posts = create_posts()
 
-      %Pagination.Ecto.List{} = list = Repo.paginate(Post)
+      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(Post)
 
       assert list.entries_count == 100
       assert list.page_size == 5
@@ -45,7 +45,7 @@ defmodule Pagination.EctoTest do
     end
 
     test "paginate/1 generate list result for non exitent entries" do
-      %Pagination.Ecto.List{} = list = Repo.paginate(Post)
+      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(Post)
 
       assert list.entries_count == 0
       assert list.page_size == 5
@@ -57,7 +57,7 @@ defmodule Pagination.EctoTest do
     test "paginate/1 paginate a query using the input page and page_size" do
       posts = create_posts()
 
-      %Pagination.Ecto.List{} = list = Repo.paginate(Post, %{"page" => 2, "page_size" => 3})
+      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(Post, %{"page" => 2, "page_size" => 3})
 
       assert list.entries_count == 100
       assert list.page_size == 3
@@ -69,7 +69,7 @@ defmodule Pagination.EctoTest do
     test "paginate/1 paginates with preloads" do
       users = create_users_with_posts()
 
-      %Pagination.Ecto.List{} = list =
+      %Pagination.Ecto.Offset.List{} = list =
         from(user in User, where: ilike(user.name, "%John%"))
         |> preload(:posts)
         |> Repo.paginate(%{"page" => 2, "page_size" => 3})
@@ -85,7 +85,7 @@ defmodule Pagination.EctoTest do
     test "paginate/1 works with a query containing distinct" do
       posts = create_posts()
 
-      %Pagination.Ecto.List{} = list =
+      %Pagination.Ecto.Offset.List{} = list =
         Post
         |> order_by(asc: :id)
         |> distinct(true)
@@ -119,7 +119,7 @@ defmodule Pagination.EctoTest do
         distinct: post.id
       )
 
-      %Pagination.Ecto.List{} = list = Repo.paginate(query, %{"page" => 2, "page_size" => 3})
+      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(query, %{"page" => 2, "page_size" => 3})
 
       assert list.entries_count == 100
       assert list.page_size == 3
@@ -161,7 +161,7 @@ defmodule Pagination.EctoTest do
         }
       )
 
-      %Pagination.Ecto.List{} = list = Repo.paginate(query, %{"page_size" => 4})
+      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(query, %{"page_size" => 4})
 
       [user_one, user_two | _tail] = users
 

@@ -1,5 +1,5 @@
 defmodule Pagination.Html.Navigation do
-  alias Pagination.Ecto.List
+  alias Pagination.Ecto.Offset.List
 
   @peripheral_links_count 2
   @surround_links_count 3

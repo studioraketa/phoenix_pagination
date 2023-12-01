@@ -2,7 +2,7 @@ defmodule Pagination.HtmlTest do
   use ExUnit.Case
 
   alias Pagination.Html
-  alias Pagination.Ecto.List
+  alias Pagination.Ecto.Offset.List
 
   test "paginate_list/1 when entries_count is 0" do
     list = %List{

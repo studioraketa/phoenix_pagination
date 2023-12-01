@@ -1,4 +1,4 @@
-defmodule Pagination.Ecto.Options do
+defmodule Pagination.Ecto.Offset.Options do
   @type t :: %__MODULE__{}
 
   @keys [:page, :page_size, :offset, :repo]

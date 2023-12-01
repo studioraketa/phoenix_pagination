@@ -1,7 +1,7 @@
-defmodule Pagination.Ecto.Query do
+defmodule Pagination.Ecto.Offset.Query do
   import Ecto.Query
 
-  alias Pagination.Ecto.Options
+  alias Pagination.Ecto.Offset.Options
 
   def entries(queryable, %Options{} = opts) do
     queryable

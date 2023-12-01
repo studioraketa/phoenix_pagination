@@ -12,7 +12,7 @@ defmodule Pagination.Ecto do
     end
   end
 
-  alias Pagination.Ecto.{List, Options}
+  alias Pagination.Ecto.Offset.{List, Options}
 
   def paginate(repo, queryable, opts, defaults) do
     options = Options.build(opts, repo, defaults)

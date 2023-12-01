@@ -2,7 +2,7 @@ defmodule Pagination.Html.NavigationTest do
   use ExUnit.Case
 
   alias Pagination.Html.Navigation
-  alias Pagination.Ecto.List
+  alias Pagination.Ecto.Offset.List
 
   test "elements/1 with a page at the first place of 10 pages" do
     list = %List{

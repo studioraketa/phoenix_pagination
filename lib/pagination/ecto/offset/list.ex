@@ -1,7 +1,7 @@
-defmodule Pagination.Ecto.List do
+defmodule Pagination.Ecto.Offset.List do
   @moduledoc false
 
-  alias Pagination.Ecto.{Options, Query}
+  alias Pagination.Ecto.Offset.{Options, Query}
 
   @type t :: %__MODULE__{}
 
