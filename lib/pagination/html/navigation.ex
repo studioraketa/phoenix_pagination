@@ -51,6 +51,4 @@ defmodule Pagination.Html.Navigation do
         "..."
     end
   end
-
-  defp page_value(_page, current_page, _pages_count), do: current_page
 end

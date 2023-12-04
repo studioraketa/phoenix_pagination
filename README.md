@@ -1,6 +1,7 @@
 # Pagination
 
-**A small library providing a simple pagination based on limit and offset**
+A small library providing a simple pagination based on limit and offset and a very naive and limited
+implementation of a cursor based pagination.
 
 ## Installation
 
@@ -26,11 +27,11 @@ defmodule MyApp.Repo do
     otp_app: :my_app,
     adapter: Ecto.Adapters.Postgres
 
-  use Pagination.Ecto, page_size: 20
+  use Pagination.Ecto, page_size: 20, cursor_page_size: 5
 end
 ```
 
-A queryable can be paginated like so:
+A queryable can be paginated with limit/offset pagination like so:
 
 ```elixir
   Repo.paginate(Post, %{"page" => 5})
@@ -57,6 +58,34 @@ The result is a struct:
   20
   iex(11)> list.entries
   [.....]
+```
+
+A queryable can be paginated with a cursor based pagination like so:
+
+> **Warning**
+> Currently the library works correctly only with unique fields!
+
+```elixir
+  Repo.cursor_paginate(Post, %{"cursor" => 5, "field" => :id, "direction" => :desc})
+```
+
+or
+
+```elixir
+  Repo.cursor_paginate(Post, %{cursor: 5, field: :id, direction: :desc})
+```
+
+The result is a struct:
+
+```elixir
+  iex(6)> list = Repo.cursor_paginate(Post, %{cursor: nil})
+  ...
+  iex(10)> list.page_size
+  20
+  iex(11)> list.entries
+  [%Post{id: 1}, ..., %Post{id: 5}]
+  iex(11)> list.cursor
+  5
 ```
 
 ### In the html templates
@@ -135,9 +164,14 @@ You can choose to render links to all pages. Use the option `show_all_pages`:
 - Do some changes
 - Run `MIX_ENV=test mix ecto.create` to create the test Databas
 - Run `MIX_ENV=test mix ecto.migrate` to migrate it
-- Run `mix test` to check if everything works
+- Run `bin/test` to check if everything works
 
 ## TODO
 
-- [ ] Work with queries including `group by` clauses.
-- [ ] Improve documentation and tests
+- Limit/Offset pagination
+  - [ ] Work with queries including `group by` clauses.
+  - [ ] Improve documentation and tests
+- Cursor pagination
+  - [ ] Work with queries including `group by` clauses.
+  - [ ] Work with queries including `order by` clauses.
+  - [ ] Improve documentation and tests
