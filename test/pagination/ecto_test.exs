@@ -3,27 +3,33 @@ defmodule Pagination.EctoTest do
 
   alias Pagination.Test.{Repo, Post, User, Tag, PostTag}
 
-  def create_user do
+  defp create_user do
     %User{name: "John Doe"} |> Repo.insert!()
   end
 
-  def create_post(user) do
+  defp create_post(user) do
     %Post{user_id: user.id, title: "A Post", content: "Some very insightful stuff here."}
     |> Repo.insert!()
   end
 
-  def create_tag(slug), do: %Tag{slug: slug} |> Repo.insert!()
+  defp update_post!(post, attrs) do
+    post
+    |> Map.merge(attrs)
+    |> Repo.insert!()
+  end
 
-  def create_posts(max_posts \\ 100) do
+  defp create_tag(slug), do: %Tag{slug: slug} |> Repo.insert!()
+
+  defp create_posts(max_posts \\ 100) do
     user = create_user()
     Enum.map(1..max_posts, fn _num -> create_post(user) end)
   end
 
-  def create_post_tag(post, tag) do
+  defp create_post_tag(post, tag) do
     %PostTag{post_id: post.id, tag_id: tag.id} |> Repo.insert!()
   end
 
-  def create_users_with_posts do
+  defp create_users_with_posts do
     Enum.map(1..20, fn _num ->
       user = create_user()
       posts = Enum.map(1..20, fn _num -> create_post(user) end)
@@ -114,6 +120,29 @@ defmodule Pagination.EctoTest do
 
       assert list.entries == entries
       assert list.cursor == encode(List.last(entries).id)
+      assert list.page_size == 20
+    end
+
+    test "cursor_paginate/1 paginate a query with a cursor for given field and direction" do
+      posts = create_posts()
+
+      Enum.map(posts, fn post ->
+        update_post!(post, %{inserted_at: NaiveDateTime.add(post.inserted_at, post.id) })
+      end)
+
+      post20 = posts |> Enum.take(20) |> List.last
+
+      %Pagination.Ecto.Cursor.List{} = list = Repo.cursor_paginate(Post, %{
+        field: :inserted_at,
+        direction: :asc,
+        page_size: 20,
+        cursor: encode(post20.inserted_at)
+      })
+
+      entries = posts |> Enum.take(40) |> Enum.chunk_every(20) |> List.last()
+
+      assert list.entries == entries
+      assert list.cursor == encode(List.last(entries).inserted_at)
       assert list.page_size == 20
     end
 

@@ -78,10 +78,10 @@ or
 The result is a struct:
 
 ```elixir
-  iex(6)> list = Repo.cursor_paginate(Post, %{cursor: nil})
+  iex(6)> list = Repo.cursor_paginate(Post, %{})
   ...
   iex(10)> list.page_size
-  20
+  5
   iex(11)> list.entries
   [%Post{id: 1}, ..., %Post{id: 5}]
   iex(11)> list.cursor
