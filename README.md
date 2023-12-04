@@ -85,7 +85,7 @@ The result is a struct:
   iex(11)> list.entries
   [%Post{id: 1}, ..., %Post{id: 5}]
   iex(11)> list.cursor
-  5
+  "NQ=="
 ```
 
 ### In the html templates
@@ -169,9 +169,11 @@ You can choose to render links to all pages. Use the option `show_all_pages`:
 ## TODO
 
 - Limit/Offset pagination
-  - [ ] Work with queries including `group by` clauses.
-  - [ ] Improve documentation and tests
+  - Work with queries including `group by` clauses.
+  - Improve documentation and tests
+    - Move the query relevant tests to a separate file `query_test.exs`
 - Cursor pagination
-  - [ ] Work with queries including `group by` clauses.
-  - [ ] Work with queries including `order by` clauses.
-  - [ ] Improve documentation and tests
+  - Work with queries including `group by` clauses.
+  - Work with queries including `order by` clauses.
+  - Improve documentation and tests
+    - Move the query relevant tests to a separate file `query_test.exs`

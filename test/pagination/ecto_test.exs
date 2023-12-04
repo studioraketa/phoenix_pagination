@@ -31,6 +31,8 @@ defmodule Pagination.EctoTest do
     end)
   end
 
+  defp encode(val), do: Base.url_encode64(to_string(val))
+
   describe "cursor pagination" do
     test "cursor_paginate/1 raises an error when an Ecto.Query with ordering" do
       query = from(post in Post, order_by: [desc: :id])
@@ -68,7 +70,7 @@ defmodule Pagination.EctoTest do
       entries = posts |> Enum.reverse |> Enum.take(5)
 
       assert list.entries == entries
-      assert list.cursor == List.last(entries).id
+      assert list.cursor == encode(List.last(entries).id)
       assert list.page_size == 5
     end
 
@@ -92,7 +94,7 @@ defmodule Pagination.EctoTest do
       entries = Enum.take(posts, 20)
 
       assert list.entries == entries
-      assert list.cursor == List.last(entries).id
+      assert list.cursor == encode(List.last(entries).id)
       assert list.page_size == 20
     end
 
@@ -105,13 +107,13 @@ defmodule Pagination.EctoTest do
         field: :id,
         direction: :asc,
         page_size: 20,
-        cursor: post20.id
+        cursor: encode(post20.id)
       })
 
       entries = posts |> Enum.take(40) |> Enum.chunk_every(20) |> List.last()
 
       assert list.entries == entries
-      assert list.cursor == List.last(entries).id
+      assert list.cursor == encode(List.last(entries).id)
       assert list.page_size == 20
     end
 
@@ -124,13 +126,13 @@ defmodule Pagination.EctoTest do
         field: :id,
         direction: :desc,
         page_size: 20,
-        cursor: post20.id
+        cursor: encode(post20.id)
       })
 
       entries = posts |> Enum.reverse() |> Enum.take(40) |> Enum.chunk_every(20) |> List.last()
 
       assert list.entries == entries
-      assert list.cursor == List.last(entries).id
+      assert list.cursor == encode(List.last(entries).id)
       assert list.page_size == 20
     end
 
@@ -150,7 +152,7 @@ defmodule Pagination.EctoTest do
 
       assert list.page_size == 3
       assert list.entries == entries
-      assert list.cursor == List.last(entries).id
+      assert list.cursor == encode(List.last(entries).id)
       refute List.first(list.entries).posts == []
     end
 
@@ -170,7 +172,7 @@ defmodule Pagination.EctoTest do
 
       assert list.page_size == 3
       assert list.entries == entries
-      assert list.cursor == List.last(entries).id
+      assert list.cursor == encode(List.last(entries).id)
     end
 
     test "cursor_paginate/1 works with a join query containing distinct" do
@@ -204,7 +206,7 @@ defmodule Pagination.EctoTest do
 
       assert list.page_size == 3
       assert list.entries == entries
-      assert list.cursor == List.last(entries).id
+      assert list.cursor == encode(List.last(entries).id)
     end
   end
 

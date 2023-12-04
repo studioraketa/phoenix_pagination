@@ -26,8 +26,13 @@ defmodule Pagination.Ecto.Cursor.List do
 
     %__MODULE__{
       entries: entries,
-      cursor: Map.get(last, opts.field),
+      cursor: encode_cursor(Map.get(last, opts.field)),
       page_size: opts.page_size
     }
+  end
+
+  defp encode_cursor(nil), do: nil
+  defp encode_cursor(cursor) do
+    Base.url_encode64(to_string(cursor))
   end
 end

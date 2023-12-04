@@ -10,10 +10,15 @@ defmodule Pagination.Ecto.Cursor.Options do
   def build(params, repo, defaults) do
     %__MODULE__{
       page_size: to_i(get(params, :page_size, defaults)),
-      cursor: get(params, :cursor),
+      cursor: decode_cursor(get(params, :cursor)),
       field: get(params, :field, defaults),
       direction: get(params, :direction, defaults),
       repo: repo
     }
+  end
+
+  defp decode_cursor(nil), do: nil
+  defp decode_cursor(cursor) do
+    Base.url_decode64!(cursor)
   end
 end
