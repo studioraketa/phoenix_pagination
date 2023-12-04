@@ -12,10 +12,11 @@ defmodule Pagination.EctoTest do
     |> Repo.insert!()
   end
 
-  defp update_post!(post, attrs) do
-    post
-    |> Map.merge(attrs)
-    |> Repo.insert!()
+  defp update_post(post, inserted_at) do
+    from(p in Post, where: p.id == ^post.id)
+    |> Repo.update_all(set: [inserted_at: inserted_at])
+
+    Repo.get!(Post, post.id)
   end
 
   defp create_tag(slug), do: %Tag{slug: slug} |> Repo.insert!()
@@ -131,11 +132,34 @@ defmodule Pagination.EctoTest do
       assert list.page_size == 20
     end
 
+    test "paginate/3 paginate when fetching the last page the cursor is nil" do
+      posts = create_posts(20)
+
+      post10 = posts |> Enum.take(10) |> List.last
+
+      %Pagination.Ecto.Cursor.List{} = list = Repo.paginate(
+        Post,
+        :cursor,
+        %{
+          field: :id,
+          direction: :asc,
+          page_size: 20,
+          cursor: encode(post10.id)
+        }
+      )
+
+      entries = posts |> Enum.chunk_every(10) |> List.last()
+
+      assert list.entries == entries
+      assert list.cursor == nil
+      assert list.page_size == 20
+    end
+
     test "paginate/3 paginate a query with a cursor for given field and direction" do
       posts = create_posts()
 
-      Enum.map(posts, fn post ->
-        update_post!(post, %{inserted_at: NaiveDateTime.add(post.inserted_at, post.id) })
+      posts = Enum.map(posts, fn post ->
+        update_post(post, NaiveDateTime.add(post.inserted_at, post.id))
       end)
 
       post20 = posts |> Enum.take(20) |> List.last

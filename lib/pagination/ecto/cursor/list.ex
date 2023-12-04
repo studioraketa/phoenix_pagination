@@ -22,13 +22,21 @@ defmodule Pagination.Ecto.Cursor.List do
   end
 
   defp to_list(entries, opts) do
-    last = List.last(entries)
-
     %__MODULE__{
       entries: entries,
-      cursor: encode_cursor(Map.get(last, opts.field)),
+      cursor: next_cursor(entries, opts),
       page_size: opts.page_size
     }
+  end
+
+  defp next_cursor(entries, opts) do
+    if opts.page_size > Enum.count(entries) do
+      nil
+    else
+      last = List.last(entries)
+
+      encode_cursor(Map.get(last, opts.field))
+    end
   end
 
   defp encode_cursor(nil), do: nil
