@@ -34,19 +34,19 @@ end
 A queryable can be paginated with limit/offset pagination like so:
 
 ```elixir
-  Repo.paginate(Post, %{"page" => 5})
+  Repo.paginate(Post, :offset, %{"page" => 5})
 ```
 
 or
 
 ```elixir
-  Repo.paginate(Post, %{page: 5})
+  Repo.paginate(Post, :offset, %{page: 5})
 ```
 
 The result is a struct:
 
 ```elixir
-  iex(6)> list = Repo.paginate(Post, %{page: 5})
+  iex(6)> list = Repo.paginate(Post, :offset, %{page: 5})
   ...
   iex(7)> list.current_page
   5
@@ -66,19 +66,19 @@ A queryable can be paginated with a cursor based pagination like so:
 > Currently the library works correctly only with unique fields!
 
 ```elixir
-  Repo.cursor_paginate(Post, %{"cursor" => 5, "field" => :id, "direction" => :desc})
+  Repo.paginate(Post, :cursor, %{"cursor" => 5, "field" => :id, "direction" => :desc})
 ```
 
 or
 
 ```elixir
-  Repo.cursor_paginate(Post, %{cursor: 5, field: :id, direction: :desc})
+  Repo.paginate(Post, :cursor, %{cursor: 5, field: :id, direction: :desc})
 ```
 
 The result is a struct:
 
 ```elixir
-  iex(6)> list = Repo.cursor_paginate(Post, %{})
+  iex(6)> list = Repo.paginate(Post, :cursor)
   ...
   iex(10)> list.page_size
   5

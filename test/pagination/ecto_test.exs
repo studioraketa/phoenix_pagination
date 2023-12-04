@@ -40,15 +40,15 @@ defmodule Pagination.EctoTest do
   defp encode(val), do: Base.url_encode64(to_string(val))
 
   describe "cursor pagination" do
-    test "cursor_paginate/1 raises an error when an Ecto.Query with ordering" do
+    test "paginate/3 raises an error when an Ecto.Query with ordering" do
       query = from(post in Post, order_by: [desc: :id])
 
       assert_raise RuntimeError, "Cannot cursor-paginate ordered query.", fn ->
-        Repo.cursor_paginate(query, %{})
+        Repo.paginate(query, :cursor)
       end
     end
 
-    test "cursor_paginate/1 raises an error when an Ecto.Query with grouping" do
+    test "paginate/3 raises an error when an Ecto.Query with grouping" do
       query = from(
         post in Post,
         join: pt in "post_tags",
@@ -64,14 +64,14 @@ defmodule Pagination.EctoTest do
       )
 
       assert_raise RuntimeError, "Cannot cursor-paginate grouped query.", fn ->
-        Repo.cursor_paginate(query, %{})
+        Repo.paginate(query, :cursor)
       end
     end
 
-    test "cursor_paginate/1 paginate a query using the defaults" do
+    test "paginate/3 paginate a query using the defaults" do
       posts = create_posts()
 
-      %Pagination.Ecto.Cursor.List{} = list = Repo.cursor_paginate(Post, %{})
+      %Pagination.Ecto.Cursor.List{} = list = Repo.paginate(Post, :cursor)
 
       entries = posts |> Enum.reverse |> Enum.take(5)
 
@@ -80,22 +80,26 @@ defmodule Pagination.EctoTest do
       assert list.page_size == 5
     end
 
-    test "cursor_paginate/1 paginate a query using the defaults for non existent entries" do
-      %Pagination.Ecto.Cursor.List{} = list = Repo.cursor_paginate(Post, %{})
+    test "paginate/3 paginate a query using the defaults for non existent entries" do
+      %Pagination.Ecto.Cursor.List{} = list = Repo.paginate(Post, :cursor)
 
       assert list.entries == []
       assert list.cursor == nil
       assert list.page_size == 5
     end
 
-    test "cursor_paginate/1 paginate a query using input parameters" do
+    test "paginate/3 paginate a query using input parameters" do
       posts = create_posts()
 
-      %Pagination.Ecto.Cursor.List{} = list = Repo.cursor_paginate(Post, %{
-        field: :id,
-        direction: :asc,
-        page_size: 20,
-      })
+      %Pagination.Ecto.Cursor.List{} = list = Repo.paginate(
+        Post,
+        :cursor,
+        %{
+          field: :id,
+          direction: :asc,
+          page_size: 20,
+        }
+      )
 
       entries = Enum.take(posts, 20)
 
@@ -104,17 +108,21 @@ defmodule Pagination.EctoTest do
       assert list.page_size == 20
     end
 
-    test "cursor_paginate/1 paginate a query with a cursor when direction is asc" do
+    test "paginate/3 paginate a query with a cursor when direction is asc" do
       posts = create_posts()
 
       post20 = posts |> Enum.take(20) |> List.last
 
-      %Pagination.Ecto.Cursor.List{} = list = Repo.cursor_paginate(Post, %{
-        field: :id,
-        direction: :asc,
-        page_size: 20,
-        cursor: encode(post20.id)
-      })
+      %Pagination.Ecto.Cursor.List{} = list = Repo.paginate(
+        Post,
+        :cursor,
+        %{
+          field: :id,
+          direction: :asc,
+          page_size: 20,
+          cursor: encode(post20.id)
+        }
+      )
 
       entries = posts |> Enum.take(40) |> Enum.chunk_every(20) |> List.last()
 
@@ -123,7 +131,7 @@ defmodule Pagination.EctoTest do
       assert list.page_size == 20
     end
 
-    test "cursor_paginate/1 paginate a query with a cursor for given field and direction" do
+    test "paginate/3 paginate a query with a cursor for given field and direction" do
       posts = create_posts()
 
       Enum.map(posts, fn post ->
@@ -132,12 +140,16 @@ defmodule Pagination.EctoTest do
 
       post20 = posts |> Enum.take(20) |> List.last
 
-      %Pagination.Ecto.Cursor.List{} = list = Repo.cursor_paginate(Post, %{
-        field: :inserted_at,
-        direction: :asc,
-        page_size: 20,
-        cursor: encode(post20.inserted_at)
-      })
+      %Pagination.Ecto.Cursor.List{} = list = Repo.paginate(
+        Post,
+        :cursor,
+        %{
+          field: :inserted_at,
+          direction: :asc,
+          page_size: 20,
+          cursor: encode(post20.inserted_at)
+        }
+      )
 
       entries = posts |> Enum.take(40) |> Enum.chunk_every(20) |> List.last()
 
@@ -146,17 +158,21 @@ defmodule Pagination.EctoTest do
       assert list.page_size == 20
     end
 
-    test "cursor_paginate/1 paginate a query with a cursor when direction is desc" do
+    test "paginate/3 paginate a query with a cursor when direction is desc" do
       posts = create_posts()
 
       post20 = posts |> Enum.reverse() |> Enum.take(20) |> List.last
 
-      %Pagination.Ecto.Cursor.List{} = list = Repo.cursor_paginate(Post, %{
-        field: :id,
-        direction: :desc,
-        page_size: 20,
-        cursor: encode(post20.id)
-      })
+      %Pagination.Ecto.Cursor.List{} = list = Repo.paginate(
+        Post,
+        :cursor,
+        %{
+          field: :id,
+          direction: :desc,
+          page_size: 20,
+          cursor: encode(post20.id)
+        }
+      )
 
       entries = posts |> Enum.reverse() |> Enum.take(40) |> Enum.chunk_every(20) |> List.last()
 
@@ -165,17 +181,20 @@ defmodule Pagination.EctoTest do
       assert list.page_size == 20
     end
 
-    test "cursor_paginate/1 paginates with preloads" do
+    test "paginate/3 paginates with preloads" do
       users = create_users_with_posts()
 
       %Pagination.Ecto.Cursor.List{} = list =
         from(user in User, where: ilike(user.name, "%John%"))
         |> preload(:posts)
-        |> Repo.cursor_paginate(%{
-          "field" => :id,
-          "direction" => :asc,
-          "page_size" => 3,
-        })
+        |> Repo.paginate(
+          :cursor,
+          %{
+            "field" => :id,
+            "direction" => :asc,
+            "page_size" => 3,
+          }
+        )
 
       entries = Enum.take(users, 3)
 
@@ -185,17 +204,20 @@ defmodule Pagination.EctoTest do
       refute List.first(list.entries).posts == []
     end
 
-    test "cursor_paginate/1 works with a query containing distinct" do
+    test "paginate/3 works with a query containing distinct" do
       posts = create_posts(10)
 
       %Pagination.Ecto.Cursor.List{} = list =
         Post
         |> distinct(true)
-        |> Repo.cursor_paginate(%{
-          "field" => :id,
-          "direction" => :asc,
-          "page_size" => 3
-        })
+        |> Repo.paginate(
+          :cursor,
+          %{
+            "field" => :id,
+            "direction" => :asc,
+            "page_size" => 3
+          }
+        )
 
       entries = Enum.take(posts, 3)
 
@@ -204,7 +226,7 @@ defmodule Pagination.EctoTest do
       assert list.cursor == encode(List.last(entries).id)
     end
 
-    test "cursor_paginate/1 works with a join query containing distinct" do
+    test "paginate/3 works with a join query containing distinct" do
       posts = create_posts()
       green = create_tag("green")
       blue = create_tag("blue")
@@ -225,11 +247,15 @@ defmodule Pagination.EctoTest do
         distinct: post.id
       )
 
-      %Pagination.Ecto.Cursor.List{} = list = Repo.cursor_paginate(query, %{
-        "field" => :id,
-        "direction" => :asc,
-        "page_size" => 3
-      })
+      %Pagination.Ecto.Cursor.List{} = list = Repo.paginate(
+        query,
+        :cursor,
+        %{
+          "field" => :id,
+          "direction" => :asc,
+          "page_size" => 3
+        }
+      )
 
       entries = Enum.take(posts, 3)
 
@@ -240,10 +266,10 @@ defmodule Pagination.EctoTest do
   end
 
   describe "pagination" do
-    test "paginate/1 paginate a query using the defaults" do
+    test "paginate/3 paginate a query using the defaults" do
       posts = create_posts()
 
-      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(Post)
+      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(Post, :offset)
 
       assert list.entries_count == 100
       assert list.page_size == 5
@@ -252,8 +278,8 @@ defmodule Pagination.EctoTest do
       assert list.entries == Enum.take(posts, 5)
     end
 
-    test "paginate/1 generate list result for non existent entries" do
-      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(Post)
+    test "paginate/3 generate list result for non existent entries" do
+      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(Post, :offset)
 
       assert list.entries_count == 0
       assert list.page_size == 5
@@ -262,10 +288,10 @@ defmodule Pagination.EctoTest do
       assert list.entries == []
     end
 
-    test "paginate/1 paginate a query using the input page and page_size" do
+    test "paginate/3 paginate a query using the input page and page_size" do
       posts = create_posts()
 
-      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(Post, %{"page" => 2, "page_size" => 3})
+      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(Post, :offset, %{"page" => 2, "page_size" => 3})
 
       assert list.entries_count == 100
       assert list.page_size == 3
@@ -274,13 +300,13 @@ defmodule Pagination.EctoTest do
       assert list.entries == posts |> Enum.take(6) |> Enum.chunk_every(3) |> List.last()
     end
 
-    test "paginate/1 paginates with preloads" do
+    test "paginate/3 paginates with preloads" do
       users = create_users_with_posts()
 
       %Pagination.Ecto.Offset.List{} = list =
         from(user in User, where: ilike(user.name, "%John%"))
         |> preload(:posts)
-        |> Repo.paginate(%{"page" => 2, "page_size" => 3})
+        |> Repo.paginate(:offset, %{"page" => 2, "page_size" => 3})
 
       assert list.entries_count == 20
       assert list.page_size == 3
@@ -290,14 +316,14 @@ defmodule Pagination.EctoTest do
       refute List.first(list.entries).posts == []
     end
 
-    test "paginate/1 works with a query containing distinct" do
+    test "paginate/3 works with a query containing distinct" do
       posts = create_posts()
 
       %Pagination.Ecto.Offset.List{} = list =
         Post
         |> order_by(asc: :id)
         |> distinct(true)
-        |> Repo.paginate(%{"page" => 2, "page_size" => 3})
+        |> Repo.paginate(:offset, %{"page" => 2, "page_size" => 3})
 
       assert list.entries_count == 100
       assert list.page_size == 3
@@ -306,7 +332,7 @@ defmodule Pagination.EctoTest do
       assert list.entries == posts |> Enum.take(6) |> Enum.chunk_every(3) |> List.last()
     end
 
-    test "paginate/1 works with a join query containing distinct" do
+    test "paginate/3 works with a join query containing distinct" do
       posts = create_posts()
       green = create_tag("green")
       blue = create_tag("blue")
@@ -327,7 +353,7 @@ defmodule Pagination.EctoTest do
         distinct: post.id
       )
 
-      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(query, %{"page" => 2, "page_size" => 3})
+      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(query, :offset, %{"page" => 2, "page_size" => 3})
 
       assert list.entries_count == 100
       assert list.page_size == 3
@@ -336,7 +362,7 @@ defmodule Pagination.EctoTest do
       assert list.entries == posts |> Enum.take(6) |> Enum.chunk_every(3) |> List.last()
     end
 
-    test "paginate/1 a query with group by" do
+    test "paginate/3 a query with group by" do
       users = create_users_with_posts()
       green = create_tag("green")
       blue = create_tag("blue")
@@ -369,7 +395,7 @@ defmodule Pagination.EctoTest do
         }
       )
 
-      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(query, %{"page_size" => 4})
+      %Pagination.Ecto.Offset.List{} = list = Repo.paginate(query, :offset, %{"page_size" => 4})
 
       [user_one, user_two | _tail] = users
 

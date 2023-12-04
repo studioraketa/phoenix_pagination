@@ -10,18 +10,23 @@ defmodule Pagination.Ecto do
 
       alias Pagination.Ecto
 
-      def paginate(queryable, opts \\ %{}) do
-        Ecto.paginate(__MODULE__, queryable, opts, page_size: @page_size, page: @page)
+      def paginate(queryable, typ, opts \\ %{})
+
+      def paginate(queryable, :offset, opts) do
+        Ecto.paginate(:offset, __MODULE__, queryable, opts, page_size: @page_size, page: @page)
       end
 
-      def cursor_paginate(queryable, opts \\ %{}) do
-        Ecto.cursor_paginate(
+      def paginate(queryable, :cursor, opts) do
+        Ecto.paginate(
+          :cursor,
           __MODULE__,
           queryable,
           opts,
-          page_size: @cursor_page_size,
-          field: @cursor_default_field,
-          direction: @cursor_default_direction
+          [
+            page_size: @cursor_page_size,
+            field: @cursor_default_field,
+            direction: @cursor_default_direction,
+          ]
         )
       end
     end
@@ -29,13 +34,13 @@ defmodule Pagination.Ecto do
 
   alias Pagination.Ecto.{Cursor, Offset}
 
-  def paginate(repo, queryable, opts, defaults) do
+  def paginate(:offset, repo, queryable, opts, defaults) do
     options = Offset.Options.build(opts, repo, defaults)
 
     Offset.List.build(queryable, options)
   end
 
-  def cursor_paginate(repo, queryable, opts, defaults) do
+  def paginate(:cursor, repo, queryable, opts, defaults) do
     Cursor.Query.assert_cursor_pagination_available!(queryable)
 
     options = Cursor.Options.build(opts, repo, defaults)
