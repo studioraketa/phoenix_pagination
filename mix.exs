@@ -4,12 +4,17 @@ defmodule Pagination.MixProject do
   def project do
     [
       app: :phoenix_pagination,
-      version: "0.4.0",
+      version: "0.5.0",
       elixir: "~> 1.9",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [
+        summary: [
+          threshold: 98
+        ]
+      ]
     ]
   end
 
@@ -29,7 +34,8 @@ defmodule Pagination.MixProject do
       {:ecto, ">= 3.0.0", optional: true},
       {:phoenix_html, ">= 2.0.0", optional: true},
       {:ecto_sql, ">= 3.0.0", only: :test},
-      {:postgrex, "~> 0.15.0", only: :test}
+      {:postgrex, "~> 0.15.0", only: :test},
+      {:credo, "1.6.7", only: [:dev, :test], runtime: false},
     ]
   end
 

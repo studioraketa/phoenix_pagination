@@ -1,7 +1,7 @@
-defmodule Pagination.Ecto.OptionsTest do
+defmodule Pagination.Ecto.Offset.OptionsTest do
   use ExUnit.Case
 
-  alias Pagination.Ecto.Options
+  alias Pagination.Ecto.Offset.Options
 
   defmodule FakeRepo do
   end

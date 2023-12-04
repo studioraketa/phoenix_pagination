@@ -1,5 +1,5 @@
 defmodule Pagination.Html.Navigation do
-  alias Pagination.Ecto.List
+  alias Pagination.Ecto.Offset.List
 
   @peripheral_links_count 2
   @surround_links_count 3
@@ -51,6 +51,4 @@ defmodule Pagination.Html.Navigation do
         "..."
     end
   end
-
-  defp page_value(_page, current_page, _pages_count), do: current_page
 end

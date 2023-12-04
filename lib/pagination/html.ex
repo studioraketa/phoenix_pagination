@@ -1,7 +1,7 @@
 defmodule Pagination.Html do
   use Phoenix.HTML
 
-  alias Pagination.Ecto.List
+  alias Pagination.Ecto.Offset.List
   alias Pagination.Html.Navigation
 
   def paginate_list(%List{} = list, path_fn, opts \\ []) do
