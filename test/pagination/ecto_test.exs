@@ -132,6 +132,24 @@ defmodule Pagination.EctoTest do
       assert list.page_size == 20
     end
 
+    test "paginate/3 paginate a query sets empty cursor when the last record matches a page last entry" do
+      posts = create_posts(5)
+
+      %Pagination.Ecto.Cursor.List{} = list = Repo.paginate(
+        Post,
+        :cursor,
+        %{
+          field: :id,
+          direction: :asc,
+          page_size: 5,
+        }
+      )
+
+      assert list.entries == posts
+      assert list.cursor == nil
+      assert list.page_size == 5
+    end
+
     test "paginate/3 paginate when fetching the last page the cursor is nil" do
       posts = create_posts(20)
 

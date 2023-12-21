@@ -1,6 +1,5 @@
 defmodule Pagination.Test.Post do
   use Ecto.Schema
-  import Ecto.Changeset
 
   alias Pagination.Test.User
 

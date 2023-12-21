@@ -19,7 +19,7 @@ defmodule Pagination.Ecto.Cursor.Query do
     queryable
     |> add_filtering(opts)
     |> add_ordering(opts)
-    |> Ecto.Query.limit(^opts.page_size)
+    |> Ecto.Query.limit(^opts.page_size + 1)
     |> opts.repo.all()
   end
 
