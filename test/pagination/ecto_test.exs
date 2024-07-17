@@ -12,6 +12,13 @@ defmodule Pagination.EctoTest do
     |> Repo.insert!()
   end
 
+  defp update_post(post, %{ord: ord}) do
+    from(p in Post, where: p.id == ^post.id)
+    |> Repo.update_all(set: [ord: ord])
+
+    Repo.get!(Post, post.id)
+  end
+
   defp update_post(post, inserted_at) do
     from(p in Post, where: p.id == ^post.id)
     |> Repo.update_all(set: [inserted_at: inserted_at])
@@ -132,6 +139,83 @@ defmodule Pagination.EctoTest do
       assert list.page_size == 20
     end
 
+    test "paginate/3 paginate a query with a cursor when direction is not given - defaults to desc" do
+      posts = create_posts()
+
+      post20 = posts |> Enum.reverse() |> Enum.take(20) |> List.last
+
+      %Pagination.Ecto.Cursor.List{} = list = Repo.paginate(
+        Post,
+        :cursor,
+        %{
+          field: :id,
+          page_size: 20,
+          cursor: encode(post20.id)
+        }
+      )
+
+      entries = posts |> Enum.reverse() |> Enum.take(40) |> Enum.chunk_every(20) |> List.last()
+
+      assert list.entries == entries
+      assert list.cursor == encode(List.last(entries).id)
+      assert list.page_size == 20
+    end
+
+    test "paginate/3 paginate a query with a cursor when direction is asc_nulls_last" do
+      posts = Enum.map(create_posts(25), fn post ->
+        update_post(post, %{ord: post.id})
+      end)
+
+      Enum.map(posts |> Enum.reverse() |> Enum.take(5), fn post ->
+        update_post(post, %{ord: nil})
+      end)
+
+      post20 = posts |> Enum.take(20) |> List.last
+
+      %Pagination.Ecto.Cursor.List{} = list = Repo.paginate(
+        Post,
+        :cursor,
+        %{
+          field: :ord,
+          direction: :asc_nulls_last,
+          page_size: 20,
+          cursor: encode(post20.ord)
+        }
+      )
+
+      assert list.entries == []
+      assert list.cursor == nil
+      assert list.page_size == 20
+    end
+
+    test "paginate/3 paginate a query with a cursor when direction is asc_nulls_first" do
+      posts = Enum.map(create_posts(25), fn post ->
+        update_post(post, %{ord: post.id})
+      end)
+
+      Enum.map(posts |> Enum.reverse() |> Enum.take(4), fn post ->
+        update_post(post, %{ord: nil})
+      end)
+
+      post20 = posts |> Enum.take(20) |> List.last
+      post21 = posts |> Enum.take(21) |> List.last
+
+      %Pagination.Ecto.Cursor.List{} = list = Repo.paginate(
+        Post,
+        :cursor,
+        %{
+          field: :ord,
+          direction: :asc_nulls_first,
+          page_size: 20,
+          cursor: encode(post20.ord)
+        }
+      )
+
+      assert list.entries == [post21]
+      assert list.cursor == nil
+      assert list.page_size == 20
+    end
+
     test "paginate/3 paginate a query sets empty cursor when the last record matches a page last entry" do
       posts = create_posts(5)
 
@@ -220,6 +304,60 @@ defmodule Pagination.EctoTest do
 
       assert list.entries == entries
       assert list.cursor == encode(List.last(entries).id)
+      assert list.page_size == 20
+    end
+
+    test "paginate/3 paginate a query with a cursor when direction is desc_nulls_last" do
+      posts = Enum.map(create_posts(25), fn post ->
+        update_post(post, %{ord: post.id})
+      end)
+
+      Enum.map(posts |> Enum.reverse() |> Enum.take(5), fn post ->
+        update_post(post, %{ord: nil})
+      end)
+
+      post20 = posts |> Enum.take(20) |> List.last
+
+      %Pagination.Ecto.Cursor.List{} = list = Repo.paginate(
+        Post,
+        :cursor,
+        %{
+          field: :ord,
+          direction: :desc_nulls_last,
+          page_size: 20,
+          cursor: encode(post20.ord)
+        }
+      )
+
+      assert list.entries == posts |> Enum.take(19) |> Enum.reverse()
+      assert list.cursor == nil
+      assert list.page_size == 20
+    end
+
+    test "paginate/3 paginate a query with a cursor when direction is desc_nulls_first" do
+      posts = Enum.map(create_posts(25), fn post ->
+        update_post(post, %{ord: post.id})
+      end)
+
+      Enum.map(posts |> Enum.reverse() |> Enum.take(4), fn post ->
+        update_post(post, %{ord: nil})
+      end)
+
+      post20 = posts |> Enum.take(20) |> List.last
+
+      %Pagination.Ecto.Cursor.List{} = list = Repo.paginate(
+        Post,
+        :cursor,
+        %{
+          field: :ord,
+          direction: :desc_nulls_first,
+          page_size: 20,
+          cursor: encode(post20.ord)
+        }
+      )
+
+      assert list.entries == posts |> Enum.take(19) |> Enum.reverse()
+      assert list.cursor == nil
       assert list.page_size == 20
     end
 

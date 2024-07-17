@@ -6,6 +6,7 @@ defmodule Pagination.Test.Post do
   schema "posts" do
     field(:title, :string)
     field(:content, :string)
+    field(:ord, :integer)
 
     belongs_to :user, User, on_replace: :nilify
 

@@ -40,7 +40,6 @@ defmodule Pagination.Ecto.Cursor.List do
     end
   end
 
-  defp encode_cursor(nil), do: nil
   defp encode_cursor(cursor) do
     Base.url_encode64(to_string(cursor))
   end

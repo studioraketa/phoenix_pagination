@@ -51,8 +51,8 @@ defmodule Pagination.HtmlTest do
       entries: [],
       current_page: 20,
       page_size: 10,
-      entries_count: 5,
-      pages_count: 1
+      entries_count: 15,
+      pages_count: 2
     }
 
     path_fn = fn x -> IO.puts(x) end

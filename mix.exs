@@ -4,8 +4,8 @@ defmodule Pagination.MixProject do
   def project do
     [
       app: :phoenix_pagination,
-      version: "0.7.0",
-      elixir: "~> 1.9",
+      version: "0.8.0",
+      elixir: "~> 1.17.2",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -31,11 +31,12 @@ defmodule Pagination.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ecto, ">= 3.0.0", optional: true},
-      {:phoenix_html, ">= 2.0.0", optional: true},
-      {:ecto_sql, ">= 3.0.0", only: :test},
-      {:postgrex, "~> 0.15.0", only: :test},
-      {:credo, "1.6.7", only: [:dev, :test], runtime: false},
+      {:ecto, ">= 3.11.2", optional: true},
+      {:phoenix_html, ">= 4.1.1", optional: true},
+      {:phoenix_html_helpers, "~> 1.0"},
+      {:ecto_sql, ">= 3.11.3", only: :test},
+      {:postgrex, "~> 0.18.0", only: :test},
+      {:credo, "1.7.7", only: [:dev, :test], runtime: false},
     ]
   end
 
