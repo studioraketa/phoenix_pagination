@@ -63,5 +63,4 @@ defmodule Pagination.Ecto.Cursor.Query do
   defp comp_op(:asc), do: :>
   defp comp_op(:asc_nulls_last), do: :>
   defp comp_op(:asc_nulls_first), do: :>
-  defp comp_op(_), do: :>
 end
