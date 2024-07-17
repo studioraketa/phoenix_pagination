@@ -10,7 +10,7 @@ Add `phoenix_pagination` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:phoenix_pagination, "~> 0.8.0", git: "https://github.com/studioraketa/phoenix_pagination/tree/feature/update-versions"}
+    {:phoenix_pagination, "~> 0.8.0", git: "https://github.com/studioraketa/phoenix_pagination.git", branch: "feature/update-versions"}
   ]
 end
 ```
