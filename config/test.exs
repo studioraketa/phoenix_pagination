@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :phoenix_pagination, ecto_repos: [Pagination.Test.Repo]
 

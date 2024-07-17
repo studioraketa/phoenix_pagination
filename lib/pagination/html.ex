@@ -1,5 +1,5 @@
 defmodule Pagination.Html do
-  use Phoenix.HTML
+  use PhoenixHTMLHelpers
 
   alias Pagination.Ecto.Offset.List
   alias Pagination.Html.Navigation
