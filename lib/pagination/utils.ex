@@ -12,7 +12,6 @@ defmodule Pagination.Utils do
   defp maybe_nil(""), do: nil
   defp maybe_nil(value), do: value
 
-
   def to_i(num) when is_binary(num), do: String.to_integer(num)
   def to_i(num) when is_integer(num), do: num
 end
