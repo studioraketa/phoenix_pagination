@@ -1,4 +1,3 @@
 #! /bin/sh
 
-# mix credo --strict && mix test --cover
-mix test --cover
+mix credo --strict && mix test --cover

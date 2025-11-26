@@ -161,7 +161,6 @@ You can choose to render links to all pages. Use the option `show_all_pages`:
 
 ## Development
 
-- Do some changes
 - Run `MIX_ENV=test mix ecto.create` to create the test Databas
 - Run `MIX_ENV=test mix ecto.migrate` to migrate it
 - Run `bin/test` to check if everything works
