@@ -19,6 +19,12 @@ defmodule Pagination.Ecto.Offset.Query do
     |> opts.repo.one
   end
 
+  defp prep_for_count(%Ecto.Query{combinations: [{union_type, _} | _]} = queryable)
+       when union_type in [:union, :union_all] do
+    queryable
+    |> subquery()
+  end
+
   # When having a distinct in the query do a subquery from the original query and then
   # select count the results.
   defp prep_for_count(%{distinct: %Ecto.Query.QueryExpr{} = _expr} = queryable) do
